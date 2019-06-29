@@ -1,0 +1,39 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:gravity="center"
+    android:layout_marginBottom="@dimen/dp_8"
+    android:layout_marginTop="@dimen/dp_8"
+    android:orientation="horizontal">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_weight="1">
+
+        <Button
+            android:id="@+id/find_shelter_button"
+            android:layout_width="140dp"
+            android:layout_height="@dimen/dp_56"
+            android:layout_gravity="center"
+            android:text="FIND SHELTER"
+            />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+
+        <Button
+            android:id="@+id/SOS_button"
+            android:layout_width="140dp"
+            android:layout_height="@dimen/dp_56"
+            android:layout_gravity="center"
+            android:text="SOS"
+            />
+    </FrameLayout>
+
+</LinearLayout>

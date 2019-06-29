@@ -45,7 +45,7 @@ public class MapRipple {
     private int mStrokeColor = Color.BLACK;               //border color of circle
     private int mStrokeWidth = 10;                        //border width of circle
     private long mDurationBetweenTwoRipples = 4000;       //in microseconds.
-    private long mRippleDuration = 12000;                 //in microseconds
+    private long mRippleDuration = 10000;                 //in microseconds
     private ValueAnimator mAnimators[];
     private Handler mHandlers[];
     private GroundOverlay mGroundOverlays[];

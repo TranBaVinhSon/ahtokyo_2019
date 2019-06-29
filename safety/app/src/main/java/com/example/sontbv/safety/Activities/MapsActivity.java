@@ -1,7 +1,12 @@
 package com.example.sontbv.safety.Activities;
 
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -9,7 +14,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.example.sontbv.safety.Fragments.MapButtonDialogFragment;
 import com.example.sontbv.safety.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -17,10 +21,25 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     private GoogleMap googleMap;
@@ -32,8 +51,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
-
-    private MapButtonDialogFragment mapButtonDialog;
 
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
@@ -50,6 +67,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
+    private List<LatLng> pontos;
+
+    private MarkerOptions shelterMarker, rescuerMarker;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,13 +80,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-        mapButtonDialog = MapButtonDialogFragment.newInstance();
-        mapButtonDialog.show(getSupportFragmentManager(), "map_buttons");
+        shelterMarker = new MarkerOptions().position(new LatLng(35.672188,139.76126)).icon(BitmapDescriptorFactory.fromBitmap(smallerDrawable(R.drawable.protection)));
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+    }
+
+    private Bitmap smallerDrawable(int id) {
+        int height = 100;
+        int width = 100;
+        BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(id);
+        Bitmap b=bitmapdraw.getBitmap();
+        Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
+
+        return smallMarker;
     }
 
     /**
@@ -83,6 +114,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap gmap) {
         googleMap = gmap;
+
+        googleMap.addMarker(shelterMarker);
+
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+
+            boolean success = googleMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            this, R.raw.style_json));
+
+            if (!success) {
+                Log.e(TAG, "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e(TAG, "Can't find style. Error: ", e);
+        }
 
         getLocationPermission();
 
@@ -166,6 +214,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                     new LatLng(mLastKnownLocation.getLatitude(),
                                             mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                            new GetDirection().execute();
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
@@ -180,4 +229,104 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+
+    class GetDirection extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            pontos = new ArrayList<>();
+        }
+
+        protected String doInBackground(String... args) {
+            String stringUrl = "https://maps.googleapis.com/maps/api/directions/json?origin=" + mLastKnownLocation.getLatitude() + "," + mLastKnownLocation.getLongitude() + "&destination=35.672188,139.76126"+ "&sensor=false&key=AIzaSyC4CSoYLqUW8zmcFaV-Zed-X8HB6ViWLiA";
+            StringBuilder response = new StringBuilder();
+            try {
+                URL url = new URL(stringUrl);
+                HttpURLConnection httpconn = (HttpURLConnection) url
+                        .openConnection();
+                if (httpconn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    BufferedReader input = new BufferedReader(
+                            new InputStreamReader(httpconn.getInputStream()),
+                            8192);
+                    String strLine = null;
+
+                    while ((strLine = input.readLine()) != null) {
+                        response.append(strLine);
+                    }
+                    input.close();
+                }
+
+                String jsonOutput = response.toString();
+
+                JSONObject jsonObject = new JSONObject(jsonOutput);
+
+                // routesArray contains ALL routes
+                JSONArray routesArray = jsonObject.getJSONArray("routes");
+                // Grab the first route
+                JSONObject route = routesArray.getJSONObject(0);
+
+                JSONObject poly = route.getJSONObject("overview_polyline");
+                String polyline = poly.getString("points");
+                pontos = decodePoly(polyline);
+
+            } catch (Exception e) {
+
+            }
+
+            return null;
+
+        }
+
+        protected void onPostExecute(String file_url) {
+            for (int i = 0; i < pontos.size() - 1; i++) {
+                LatLng src = pontos.get(i);
+                LatLng dest = pontos.get(i + 1);
+                try{
+                    //here is where it will draw the polyline in your map
+                    Polyline line = googleMap.addPolyline(new PolylineOptions()
+                            .add(new LatLng(src.latitude, src.longitude),
+                                    new LatLng(dest.latitude, dest.longitude))
+                            .width(15).color(Color.RED).geodesic(true));
+                }catch(NullPointerException e){
+                    Log.e("Error", "NullPointerException onPostExecute: " + e.toString());
+                }catch (Exception e2) {
+                    Log.e("Error", "Exception onPostExecute: " + e2.toString());
+                }
+            }
+        }
+    }
+
+    private List<LatLng> decodePoly(String encoded) {
+
+        List<LatLng> poly = new ArrayList<LatLng>();
+        int index = 0, len = encoded.length();
+        int lat = 0, lng = 0;
+
+        while (index < len) {
+            int b, shift = 0, result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
+
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
+
+            LatLng p = new LatLng((((double) lat / 1E5)),
+                    (((double) lng / 1E5)));
+            poly.add(p);
+        }
+
+        return poly;
+    }
 }

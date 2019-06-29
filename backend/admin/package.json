@@ -12,11 +12,14 @@
   "dependencies": {
     "aws-amplify": "^1.1.29",
     "aws-amplify-vue": "^0.2.12",
+    "aws-appsync": "^1.8.1",
     "bootstrap": "^4.0.0",
     "chartist": "^0.11.0",
     "es6-promise": "^4.2.4",
     "vue": "^2.5.17",
+    "vue-apollo": "^3.0.0-rc.1",
     "vue-clickaway": "^2.1.0",
+    "vue-form-generator": "^2.3.4",
     "vue-notifyjs": "^0.3.0",
     "vue-router": "^3.0.1"
   },

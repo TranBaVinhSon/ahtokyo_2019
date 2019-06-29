@@ -11,12 +11,19 @@ import Maps from "@/pages/Maps.vue";
 import Typography from "@/pages/Typography.vue";
 import TableList from "@/pages/TableList.vue";
 
+import Users from '@/pages/Users'
+
 const routes = [
   {
     path: "/",
     component: DashboardLayout,
     redirect: "/dashboard",
     children: [
+      {
+        path: "users",
+        name: "users",
+        component: Users
+      },
       {
         path: "dashboard",
         name: "dashboard",

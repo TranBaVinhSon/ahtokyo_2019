@@ -1,5 +1,6 @@
 package com.example.sontbv.safety.Activities;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -8,12 +9,17 @@ import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
+import com.example.sontbv.Libs.MapRipple;
 import com.example.sontbv.safety.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -25,6 +31,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -69,7 +76,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private List<LatLng> pontos;
 
-    private MarkerOptions shelterMarker, rescuerMarker;
+    private MarkerOptions shelterMarkerOptions, rescuerMarkerOptions;
+    private Marker shelterMarker, rescuerMarker;
+    private Button shelterButton, sosButton, detailButton;
+    private LinearLayout loadingLayout, buttonLayout, shelterLayout, rescuerLayout;
 
 
     @Override
@@ -80,7 +90,63 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-        shelterMarker = new MarkerOptions().position(new LatLng(35.672188,139.76126)).icon(BitmapDescriptorFactory.fromBitmap(smallerDrawable(R.drawable.protection)));
+        shelterMarkerOptions = new MarkerOptions().position(new LatLng(35.674707,139.7314745)).icon(BitmapDescriptorFactory.fromBitmap(smallerDrawable(R.drawable.protection)));
+        rescuerMarkerOptions = new MarkerOptions().position(new LatLng(35.672328,139.761287)).icon(BitmapDescriptorFactory.fromBitmap(smallerDrawable(R.drawable.rescue)));
+
+        shelterButton = findViewById(R.id.find_shelter_button);
+        sosButton = findViewById(R.id.sos_button);
+        detailButton = findViewById(R.id.detail_button);
+        loadingLayout = findViewById(R.id.loading_layout);
+        buttonLayout = findViewById(R.id.button_layout);
+        shelterLayout = findViewById((R.id.shelter_layout));
+        rescuerLayout = findViewById(R.id.rescuer_layout);
+
+        shelterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                loadingLayout.setVisibility(View.VISIBLE);
+                buttonLayout.setVisibility(View.INVISIBLE);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        new GetDirection().execute();
+                    }
+                }, 5000);
+
+            }
+        });
+
+        sosButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MapRipple mapRipple = new MapRipple(googleMap, new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()), getApplicationContext())
+                .withNumberOfRipples(3)
+                .withFillColor(Color.parseColor("#FFA3D2E4"))
+                .withStrokeWidth(0);
+
+                mapRipple.startRippleMapAnimation();
+                loadingLayout.setVisibility(View.VISIBLE);
+                buttonLayout.setVisibility(View.INVISIBLE);
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mapRipple.stopRippleMapAnimation();
+
+                        new GetRescue().execute();
+                    }
+                }, 10000);
+            }
+        });
+
+        detailButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent myIntent = new Intent(MapsActivity.this, CommunityInfoActivity.class);
+                MapsActivity.this.startActivity(myIntent);
+            }
+        });
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -115,7 +181,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap gmap) {
         googleMap = gmap;
 
-        googleMap.addMarker(shelterMarker);
+        shelterMarker = googleMap.addMarker(shelterMarkerOptions);
+        rescuerMarker = googleMap.addMarker(rescuerMarkerOptions);
+        shelterMarker.setVisible(false);
+        rescuerMarker.setVisible(false);
 
         try {
             // Customise the styling of the base map using a JSON object defined
@@ -214,7 +283,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                     new LatLng(mLastKnownLocation.getLatitude(),
                                             mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
-                            new GetDirection().execute();
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
@@ -238,7 +306,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         protected String doInBackground(String... args) {
-            String stringUrl = "https://maps.googleapis.com/maps/api/directions/json?origin=" + mLastKnownLocation.getLatitude() + "," + mLastKnownLocation.getLongitude() + "&destination=35.672188,139.76126"+ "&sensor=false&key=AIzaSyC4CSoYLqUW8zmcFaV-Zed-X8HB6ViWLiA";
+            String stringUrl = "https://maps.googleapis.com/maps/api/directions/json?origin=" + mLastKnownLocation.getLatitude() + "," + mLastKnownLocation.getLongitude() + "&destination=35.674707,139.7314745"+ "&sensor=false&key=AIzaSyC4CSoYLqUW8zmcFaV-Zed-X8HB6ViWLiA";
             StringBuilder response = new StringBuilder();
             try {
                 URL url = new URL(stringUrl);
@@ -278,6 +346,82 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         protected void onPostExecute(String file_url) {
+
+            loadingLayout.setVisibility(View.INVISIBLE);
+            shelterLayout.setVisibility(View.VISIBLE);
+
+            shelterMarker.setVisible(true);
+            for (int i = 0; i < pontos.size() - 1; i++) {
+                LatLng src = pontos.get(i);
+                LatLng dest = pontos.get(i + 1);
+                try{
+                    //here is where it will draw the polyline in your map
+                    Polyline line = googleMap.addPolyline(new PolylineOptions()
+                            .add(new LatLng(src.latitude, src.longitude),
+                                    new LatLng(dest.latitude, dest.longitude))
+                            .width(15).color(Color.RED).geodesic(true));
+                }catch(NullPointerException e){
+                    Log.e("Error", "NullPointerException onPostExecute: " + e.toString());
+                }catch (Exception e2) {
+                    Log.e("Error", "Exception onPostExecute: " + e2.toString());
+                }
+            }
+        }
+    }
+
+    class GetRescue extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            pontos = new ArrayList<>();
+        }
+
+        protected String doInBackground(String... args) {
+            String stringUrl = "https://maps.googleapis.com/maps/api/directions/json?origin=" + mLastKnownLocation.getLatitude() + "," + mLastKnownLocation.getLongitude() + "&destination=35.672328,139.761287"+ "&sensor=false&key=AIzaSyC4CSoYLqUW8zmcFaV-Zed-X8HB6ViWLiA";
+            StringBuilder response = new StringBuilder();
+            try {
+                URL url = new URL(stringUrl);
+                HttpURLConnection httpconn = (HttpURLConnection) url
+                        .openConnection();
+                if (httpconn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    BufferedReader input = new BufferedReader(
+                            new InputStreamReader(httpconn.getInputStream()),
+                            8192);
+                    String strLine = null;
+
+                    while ((strLine = input.readLine()) != null) {
+                        response.append(strLine);
+                    }
+                    input.close();
+                }
+
+                String jsonOutput = response.toString();
+
+                JSONObject jsonObject = new JSONObject(jsonOutput);
+
+                // routesArray contains ALL routes
+                JSONArray routesArray = jsonObject.getJSONArray("routes");
+                // Grab the first route
+                JSONObject route = routesArray.getJSONObject(0);
+
+                JSONObject poly = route.getJSONObject("overview_polyline");
+                String polyline = poly.getString("points");
+                pontos = decodePoly(polyline);
+
+            } catch (Exception e) {
+
+            }
+
+            return null;
+
+        }
+
+        protected void onPostExecute(String file_url) {
+            loadingLayout.setVisibility(View.INVISIBLE);
+            rescuerLayout.setVisibility(View.VISIBLE);
+
+            rescuerMarker.setVisible(true);
+
             for (int i = 0; i < pontos.size() - 1; i++) {
                 LatLng src = pontos.get(i);
                 LatLng dest = pontos.get(i + 1);

@@ -17,7 +17,8 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyC4CSoYLqUW8zmcFaV-Zed-X8HB6ViWLiA" />
 
-        <activity android:name=".Activities.MapsActivity">
+        <activity android:name=".Activities.MapsActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,7 +26,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Activities.CommunityActivity">
+        <activity android:name=".Activities.CommunityInfoActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity android:name=".Activities.CommunityActivity"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
         <activity android:name=".Activities.MainActivity">

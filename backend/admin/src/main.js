@@ -7,6 +7,9 @@ import VueApollo from 'vue-apollo'
 import AWSAppSyncClient from 'aws-appsync'
 import PaperDashboard from "./plugins/paperDashboard"
 import "vue-notifyjs/themes/default.css"
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 const config = {
 	url: 'https://yhiw2i646zb6llkjiumnytu3qq.appsync-api.ap-northeast-1.amazonaws.com/graphql',
@@ -31,9 +34,11 @@ const appsyncProvider = new VueApollo({
 	defaultClient: client
 })
 
+library.add(faUserSecret)
 Vue.use(VueFormGenerator)
 Vue.use(VueApollo)
 Vue.use(PaperDashboard)
+Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 Vue.config.productionTip = false
 

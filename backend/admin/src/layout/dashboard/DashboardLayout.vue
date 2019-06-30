@@ -5,8 +5,8 @@
 				<sidebar-link to="/shelters" name="Shelters" :icon="'ti-home'"/>
 
 				<sidebar-link to="/dashboard" name="Analytics" icon="ti-panel"/>
-				<sidebar-link to="/stats" name="Log out" icon="ti-shift-right" />
-				<sidebar-link to="/icons" name="Log out" icon="ti-user"/>
+				<sidebar-link to="/stats" name="Account" icon="ti-user"/>
+				<sidebar-link to="/icons" name="Logout" icon="ti-shift-right"/>
 			</template>
 
 			<mobile-menu>
@@ -17,7 +17,7 @@
 				</a>
 				</li>
 				<drop-down class="nav-item"
-						title="5 Notifications"
+						title="Minato-ku"
 						title-classes="nav-link"
 						icon="ti-bell">
 				<a class="dropdown-item">Notification 1</a>

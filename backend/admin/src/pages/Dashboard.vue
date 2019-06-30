@@ -23,7 +23,7 @@
     <div class="row">
 
       <div class="col-12">
-        <chart-card title="Users behavior"
+        <chart-card title="Rescue work"
                     sub-title="24 Hours performance"
                     :chart-data="usersChart.data"
                     :chart-options="usersChart.options">
@@ -31,39 +31,38 @@
             <i class="ti-reload"></i> Updated 3 minutes ago
           </span>
           <div slot="legend">
-            <i class="fa fa-circle text-info"></i> Open
-            <i class="fa fa-circle text-danger"></i> Click
-            <i class="fa fa-circle text-warning"></i> Click Second Time
+            <i class="fa fa-circle text-info"></i> Saved
+            <i class="fa fa-circle text-danger"></i> Missing
+            <i class="fa fa-circle text-warning"></i> Wait to rescue
           </div>
         </chart-card>
       </div>
 
       <div class="col-md-6 col-12">
-        <chart-card title="Email Statistics"
-                    sub-title="Last campaign performance"
+        <chart-card title="People Age"
                     :chart-data="preferencesChart.data"
                     chart-type="Pie">
           <span slot="footer">
-            <i class="ti-timer"></i> Campaign set 2 days ago</span>
+            <i class="ti-timer"></i> Last 2 hours ago</span>
           <div slot="legend">
-            <i class="fa fa-circle text-info"></i> Open
-            <i class="fa fa-circle text-danger"></i> Bounce
-            <i class="fa fa-circle text-warning"></i> Unsubscribe
+            <i class="fa fa-circle text-danger"></i> &lt;10
+            <i class="fa fa-circle text-info"></i> 20-60
+            <i class="fa fa-circle text-warning"></i> >60
           </div>
         </chart-card>
       </div>
 
       <div class="col-md-6 col-12">
-        <chart-card title="2015 Sales"
-                    sub-title="All products including Taxes"
+        <chart-card title="Resouces"
+                    sub-title="Remaining resources"
                     :chart-data="activityChart.data"
                     :chart-options="activityChart.options">
           <span slot="footer">
-            <i class="ti-check"></i> Data information certified
+            <i class="ti-check"></i> Last update 1 day ago
           </span>
           <div slot="legend">
-            <i class="fa fa-circle text-info"></i> Tesla Model S
-            <i class="fa fa-circle text-warning"></i> BMW 5 Series
+            <i class="fa fa-circle text-info"></i> Food
+            <i class="fa fa-circle text-warning"></i> Medicine
           </div>
         </chart-card>
       </div>
@@ -88,9 +87,9 @@ export default {
       statsCards: [
         {
           type: "warning",
-          icon: "ti-server",
-          title: "Capacity",
-          value: "105GB",
+          icon: "ti-home",
+          title: "Shelter",
+          value: "5 places",
           footerText: "Updated now",
           footerIcon: "ti-reload"
         },
@@ -105,16 +104,16 @@ export default {
         {
           type: "danger",
           icon: "ti-pulse",
-          title: "Errors",
+          title: "Emergency",
           value: "23",
           footerText: "In the last hour",
           footerIcon: "ti-timer"
         },
         {
           type: "info",
-          icon: "ti-twitter-alt",
-          title: "Followers",
-          value: "+45",
+          icon: "ti-user",
+          title: "People",
+          value: "+1500",
           footerText: "Updated now",
           footerIcon: "ti-reload"
         }
@@ -129,17 +128,18 @@ export default {
             "9:00PM",
             "12:00PM",
             "3:00AM",
-            "6:00AM"
+            "6:00AM",
+            "8:00AM"
           ],
           series: [
-            [287, 385, 490, 562, 594, 626, 698, 895, 952],
-            [67, 152, 193, 240, 387, 435, 535, 642, 744],
-            [23, 113, 67, 108, 190, 239, 307, 410, 410]
+            [50, 110, 240, 300, 800, 854, 1100, 1250, 1350],
+            [20, 390, 400, 450, 290, 550, 578, 600, 650],
+            [2, 10, 30, 50, 100, 120, 125, 130, 200]
           ]
         },
         options: {
           low: 0,
-          high: 1000,
+          high: 2000,
           showArea: true,
           height: "245px",
           axisX: {
@@ -169,8 +169,8 @@ export default {
             "Dec"
           ],
           series: [
-            [542, 543, 520, 680, 653, 753, 326, 434, 568, 610, 756, 895],
-            [230, 293, 380, 480, 503, 553, 600, 664, 698, 710, 736, 795]
+            [542, 543, 520, 680, 653, 753, 500, 550, 568, 610, 756, 895],
+            [230, 293, 380, 480, 503, 553, 400, 450, 698, 710, 736, 795]
           ]
         },
         options: {

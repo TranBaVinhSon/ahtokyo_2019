@@ -1,5 +1,6 @@
 package com.example.sontbv.safety.Activities;
 
+import android.graphics.Movie;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -8,15 +9,27 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.example.sontbv.safety.Adapters.ChatAdapter;
 import com.example.sontbv.safety.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CommunityActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener  {
+
+    private List<String> chatList = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private ChatAdapter mAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +46,26 @@ public class CommunityActivity extends AppCompatActivity implements NavigationVi
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+
+        mAdapter = new ChatAdapter(chatList);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
+
+        prepareMovieData();
+    }
+
+    private void prepareMovieData() {
+        chatList.add("Deleniti magnam officia voluptates aut quo quo amet sunt. Toolorum temporibus extas iste voluptate incidunt ut.");
+        chatList.add("nventore id m. Atque sint impedit a dignissimos dolores. Reiciendis minus eius sed rerum.");
+        chatList.add("Est iusto dolorem et odio molesveniam nobis optio..");
+        chatList.add(" pariatur ex voluptatibus dolorum temporibus expl.  id  incidunt voluptas iste voluptate incidunt ut.");
+
+
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override

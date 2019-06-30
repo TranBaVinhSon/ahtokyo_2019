@@ -145,8 +145,27 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="56dp"
+                android:orientation="horizontal"
+                android:paddingLeft="16dp">
 
+                <ImageView
+                    android:layout_width="60px"
+                    android:layout_height="60px"
+                    android:src="@drawable/icon1"/>
+
+                <ImageView
+                    android:layout_width="60px"
+                    android:layout_height="60px"
+                    android:src="@drawable/icon2"
+                    android:layout_marginLeft="16dp"/>
+
+                <ImageView
+                    android:layout_width="60px"
+                    android:layout_height="60px"
+                    android:src="@drawable/icon3"
+                    android:layout_marginLeft="16dp"/>
+                
             </LinearLayout>
 
         </LinearLayout>

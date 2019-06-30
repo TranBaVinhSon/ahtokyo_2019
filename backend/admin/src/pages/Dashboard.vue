@@ -94,14 +94,6 @@ export default {
           footerIcon: "ti-reload"
         },
         {
-          type: "success",
-          icon: "ti-wallet",
-          title: "Revenue",
-          value: "$1,345",
-          footerText: "Last day",
-          footerIcon: "ti-calendar"
-        },
-        {
           type: "danger",
           icon: "ti-pulse",
           title: "Emergency",

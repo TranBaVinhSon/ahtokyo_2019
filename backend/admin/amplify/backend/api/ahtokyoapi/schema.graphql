@@ -1,0 +1,27 @@
+type User @model @searchable {
+	id: ID!
+	full_name: String!
+	email: String
+	longitude: Float
+	latitude: Float
+	avatar: String
+	shelter: Shelter @connection(name: "ShelterUsers")
+}
+
+type Shelter @model @searchable {
+	id: ID!
+	longitude: Float
+	latitude: Float
+	medical_kit: Int
+	food_kit: Int
+	goverment_id: Int
+	photo: String
+	goverment: Goverment @connection(name: "GovermentShelters")
+	users: [User] @connection(name: "ShelterUsers")
+}
+
+type Goverment @model @searchable {
+	id: ID!
+	name: String
+	shelters: [Shelter] @connection(name: "GovermentShelters")
+}
